@@ -10,7 +10,7 @@ const schma=require("../Schema/schema")
 
 route.get("/data", async (req,res)=>{
     try{
-        const data= await schma.find()
+        const data= await schma.find().sort({createdAt:-1})
     res.status(200).json({
         status:"yes",
         data
