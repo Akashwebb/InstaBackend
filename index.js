@@ -13,11 +13,21 @@ app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
 
 // mongoose Connection
+// mongoose.set('strictQuery', true);
+// async function connection(){
+//       const conn= await mongoose.connect('mongodb+srv://akash:akash@cluster0.dpwoj7s.mongodb.net/?retryWrites=true&w=majority')
+// }
+// connection()
+const uri = `mongodb+srv://akash:akash@cluster0.dpwoj7s.mongodb.net/?retryWrites=true&w=majority`;
 mongoose.set('strictQuery', true);
-async function connection(){
-      const conn= await mongoose.connect('mongodb+srv://akash:akash@cluster0.dpwoj7s.mongodb.net/?retryWrites=true&w=majority')
-}
-connection()
+mongoose.connect(uri,(err)=>{
+    if(err){
+        console.log("Connected to mongodb Failed");
+    }
+    else{
+        console.log("Successfully connected to mongodb");
+    }
+})
 
 
 
