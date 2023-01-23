@@ -7,6 +7,10 @@ const path=require("path")
 const cors = require('cors')
 app.use(cors())
 
+//body parser
+const bodyParser=require("body-parser")
+app.use(bodyParser.urlencoded({extended:false}))
+app.use(bodyParser.json())
 
 // mongoose Connection
 mongoose.set('strictQuery', true);
@@ -22,23 +26,68 @@ const fileUpload=require("express-fileupload")
 app.use(fileUpload())
 
 
-
-// exporting api.js  and  using it
-const api=require("./route/api")
-app.use("/app/v1",api)
-
-
-// app.get("app/v1/images",async(req,res)=>{
-//      console.log("ok")
-//      res.sendFile(path.join(__dirname,`./public/${req.params.images}`))
-//  })
-
+ const schma=require("./Schema/schema")
 app.get("/images/:images" ,(req,res)=>{
-     
      res.sendFile(path.join(__dirname,`./public/${req.params.images}`))
-     
 })
+
+app.get("/api/data", async (req,res)=>{
+     try{
+         const data= await schma.find().sort({createdAt:-1})
+          res.status(200).json({
+         status:"yes",
+         data
+     })
+     }catch(e){
+         res.status(400).json({
+             status:"no",
+             message:e.message
+         })
+     }
+ })
+
+
+app.post("/data",async (req,res)=>{
+     const {author,location,description}=req.body
+     const {image_file}=req.files
+     image_file.mv(`./public/${image_file.name}`,async (err)=>{
+         if(err){
+                  res.status(400).json({
+                     status:"no",
+                     message:e.message
+                 })
+            
+         }else{
+              try{
+                  const value=await schma.create({
+                      author:author,
+                      location:location,
+                      description:description,
+                      likes:0,
+                      image_file:image_file.name
+                      
+                  })
+                  console.log(value)
+                  res.json({
+                     message:"all good",
+                     value
+                  })
+              }
+              catch(e){
+                 res.status(400).json({
+                     status:"no",
+                     message:e.message
+                 })
+             }
+         }
+     })
+    
+    
+ })
+ 
+ 
 app.get("*",(req,res)=>{
      res.send("page not found")
 })
+
 app.listen(3001, ()=>{console.log("server is up")})
